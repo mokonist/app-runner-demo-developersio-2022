@@ -3,6 +3,7 @@ name: Actions
 on:
   push:
     branches: [ "main" ]
+    tags:
   release:
 
 
@@ -26,6 +27,7 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
+    needs: [test]
     steps:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -38,5 +40,19 @@ jobs:
         if: ${{ contains(github.ref, 'refs/heads/') }}
         env:
           SERVICE_ARN: ${{ secrets.APP_RUNNER_ARN_DEV }}
+        run: |
+          aws apprunner start-deployment --service-arn $SERVICE_ARN 
+
+      - name: Deploy to staging
+        if: ${{ contains(github.ref, 'refs/tags/') }}
+        env:
+          SERVICE_ARN: ${{ secrets.APP_RUNNER_ARN_STG }}
+        run: |
+          aws apprunner start-deployment --service-arn $SERVICE_ARN 
+
+      - name: Deploy to production
+        if: ${{ github.event_name == 'release' }}
+        env:
+          SERVICE_ARN: ${{ secrets.APP_RUNNER_ARN_PRD }}
         run: |
           aws apprunner start-deployment --service-arn $SERVICE_ARN 
