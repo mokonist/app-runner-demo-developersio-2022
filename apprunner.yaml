@@ -1,0 +1,9 @@
+version: 1.0
+runtime: node14
+build:
+  commands:
+    build:
+      - npm ci
+      - npm run build
+run:
+  command: npm start
