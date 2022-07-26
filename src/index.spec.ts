@@ -2,7 +2,7 @@ import request from "supertest";
 
 import app, { listen } from "./index";
 
-describe("/", () => {
+describe("GET /", () => {
   test("should return hello world message", () => {
     return request(app)
       .get("/")
